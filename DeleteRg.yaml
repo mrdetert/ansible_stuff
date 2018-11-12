@@ -1,0 +1,10 @@
+- name: Create  VM
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Delete resource group
+    azure_rm_resourcegroup:
+      name: "{{MyRg}}"
+      location: westeurope
+      state: absent
+      force: yes
