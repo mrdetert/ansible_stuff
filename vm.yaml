@@ -62,9 +62,9 @@
         - path: /home/azureops/.ssh/authorized_keys
           key_data: |
             {{lookup('file', '/home/azureops/.ssh/id_rsa.pub')}}
-      network_interfaces: myNIC
+      network_interfaces: "{{MyNic}}"
       image:
-        offer: UbuntuLTS
+        offer: UbuntuServer
         publisher: Canonical
-        sku: '16.04'
+        sku: '16.04-LTS'
         version: latest
