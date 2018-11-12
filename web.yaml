@@ -1,0 +1,27 @@
+---
+- hosts: localhost
+  connection: local
+  vars:
+    group: table5jdrg
+    webapp_name: table5jdwebapp
+    location: westeurope
+  tasks:
+  - name: create rg
+    azure_rm_resourcegroup:
+      name: "{{group}}"
+      location: "{{location}}"
+  - name: create app svc
+    azure_rm_webapp:
+      resource_group: "{{group}}"
+      name: "{{webapp_name}}"
+      plan:
+        is_linux: true
+        name: table5jdwebappplan
+        sku: S1
+        number_workers: 1
+      frameworks:
+      - name: java
+        version: "8"
+        settings:
+          java_container: tomcat
+          java_container_version: 8.5
