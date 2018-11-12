@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+  - name: create a resource
+    azure_rm_resourcegroup:
+      name: table5jdansibletest
+      location: westeurope
+      state: absent
+      tags:
+        testing: testing
+        delete: never
