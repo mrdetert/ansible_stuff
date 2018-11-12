@@ -1,0 +1,16 @@
+- name: Create  VM
+  hosts: localhost
+  connection: local
+  vars:
+    MyRg: table5jdlab
+    MyVnet: table5jdvnet
+    MySubnet: table5jdsubnet
+    MyVm: table5jdvm1
+    MyNic: table5jdnic
+  tasks:
+  - name: Create resource group
+    azure_rm_resourcegroup:
+      name: "{{MyRg}}"
+      location: westeurope
+      state: absent
+      force: yes
