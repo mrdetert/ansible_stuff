@@ -62,6 +62,8 @@
   - debug: var=curl.stdout
 
 - hosts: localhost
+  vars_files:
+  - vars.yaml
   tasks:
   - name: Absent resource group
     azure_rm_resourcegroup:
