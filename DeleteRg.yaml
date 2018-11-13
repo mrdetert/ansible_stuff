@@ -3,7 +3,7 @@
   tasks:
   - name: Delete resource group
     azure_rm_resourcegroup:
-      name: "{{RgName}}"
+      name: "{{MyRg}}"
       location: westeurope
       state: absent
       force: yes

@@ -70,3 +70,4 @@
       name: "{{MyRg}}"
       location: westeurope
       state: absent
+      force: yes
