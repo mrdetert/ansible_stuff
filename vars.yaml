@@ -1,0 +1,7 @@
+prefix: table5jd
+MyRg: "{{prefix}}lab"
+MyVnet: "{{prefix}}vnet"
+MySubnet: "{{prefix}}subnet"
+MyVm: "{{prefix}}vm1"
+MyNic: "{{prefix}}nic"
+MyNsg: "{{prefix}}nsggroup"

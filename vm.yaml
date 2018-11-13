@@ -1,12 +1,8 @@
 - name: Create  VM
   hosts: localhost
   connection: local
-  vars:
-    MyRg: table5jdlab
-    MyVnet: table5jdvnet
-    MySubnet: table5jdsubnet
-    MyVm: table5jdvm1
-    MyNic: table5jdnic
+  vars_files:
+  - vars.yaml
   tasks:
   - name: Create resource group
     azure_rm_resourcegroup:
@@ -23,19 +19,10 @@
       name: "{{MySubnet}}"
       address_prefix: "10.0.1.0/24"
       virtual_network: "{{MyVnet}}"
-  - name: Create public IP address
-    azure_rm_publicipaddress:
-      resource_group: "{{MyRg}}"
-      allocation_method: Static
-      name: table5jdPubIp
-    register: output_ip_address
-  - name: Output public IP 
-    debug:
-      msg: "Public IP is {{ output_ip_address.state.ip_address }}."
   - name: Create Network Security Group that allows SSH
     azure_rm_securitygroup:
       resource_group: "{{MyRg}}"
-      name: table5jdnsggroup
+      name: "{{MyNsg}}"
       rules:
         - name: SSH
           protocol: Tcp
@@ -43,28 +30,19 @@
           access: Allow
           priority: 1001
           direction: Inbound
-  - name: Create virtual network inteface card
-    azure_rm_networkinterface:
-      resource_group: "{{MyRg}}"
-      name: "{{MyNic}}"
-      virtual_network: "{{MyVnet}}"
-      subnet: "{{MySubnet}}"
-      public_ip_name: table5jdPubIp
-      security_group: table5jdnsggroup
-  - name: Create VM
-    azure_rm_virtualmachine:
-      resource_group: "{{MyRg}}"
-      name: "{{MyVm}}"
-      vm_size: Standard_DS1_v2
-      admin_username: azureops
-      ssh_password_enabled: false
-      ssh_public_keys:
-        - path: /home/azureops/.ssh/authorized_keys
-          key_data: |
-            {{lookup('file', '/home/azureops/.ssh/id_rsa.pub')}}
-      network_interfaces: "{{MyNic}}"
-      image:
-        offer: UbuntuServer
-        publisher: Canonical
-        sku: '16.04-LTS'
-        version: latest
+        - name: HTTP
+          protocol: Tcp
+          destination_port_range: 80
+          access: Allow
+          priority: 1002
+          direction: Inbound
+  - include_tasks: vm_details.yaml
+    loop:
+    - { name: 'one', tag: 'haproxy' }
+    - { name: 'two', tag: 'apache' }
+    - { name: 'tres', tag: 'apache' }
+    loop_control:
+      loop_var: vm
+
+- include: apache.yaml
+- include: haproxy.yaml

@@ -1,0 +1,46 @@
+- name: Create public IP address
+  azure_rm_publicipaddress:
+    resource_group: "{{MyRg}}"
+    allocation_method: Static
+    name: "{{prefix}}PubIp{{vm.name}}"
+  register: output_ip_address
+
+- name: Output public IP 
+  debug:
+    msg: "Public IP is {{ output_ip_address.state.ip_address }}."
+
+- name: Create virtual network inteface card
+  azure_rm_networkinterface:
+    resource_group: "{{MyRg}}"
+    name: "{{MyNic}}{{vm.name}}"
+    virtual_network: "{{MyVnet}}"
+    subnet: "{{MySubnet}}"
+    public_ip_name: "{{prefix}}PubIp{{vm.name}}"
+    security_group: "{{MyNsg}}"
+
+- name: Create VM
+  azure_rm_virtualmachine:
+    resource_group: "{{MyRg}}"
+    name: "{{MyVm}}{{vm.name}}"
+    vm_size: Standard_DS1_v2
+    admin_username: azureops
+    ssh_password_enabled: false
+    ssh_public_keys:
+      - path: /home/azureops/.ssh/authorized_keys
+        key_data: |
+          {{lookup('file', '/home/azureops/.ssh/id_rsa.pub')}}
+    network_interfaces: "{{MyNic}}{{vm.name}}"
+    image:
+      offer: UbuntuServer
+      publisher: Canonical
+      sku: '16.04-LTS'
+      version: latest
+    tags:
+      machine_role: "{{vm.tag}}"
+
+- name: Add vm="{{MyVm}}{{vm.name}} to ansible dynamic inventory"
+  add_host:
+    name: "{{output_ip_address.state.ip_address}}"
+    group: "{{vm.tag}}"
+    ansible_user: "azureops"
+
