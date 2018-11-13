@@ -46,3 +46,25 @@
 
 - include: apache.yaml
 - include: haproxy.yaml
+
+- hosts: localhost
+  tasks:
+  - name: Test Haproxy
+    shell: curl --silent http://"{{groups['haproxy'][0]}}" | grep 'App backend'
+    register: curl
+    
+  - debug: var=curl.stdout
+
+  - name: Test Haproxy Again
+    shell: curl --silent http://"{{groups['haproxy'][0]}}" | grep 'App backend'
+    register: curl
+    
+  - debug: var=curl.stdout
+
+- hosts: localhost
+  tasks:
+  - name: Absent resource group
+    azure_rm_resourcegroup:
+      name: "{{MyRg}}"
+      location: westeurope
+      state: absent
